@@ -17,7 +17,7 @@ import {
   type InsertUserBadge,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count, sum, and, gte, lte } from "drizzle-orm";
+import { eq, desc, count, sum, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
@@ -144,7 +144,9 @@ export class DatabaseStorage implements IStorage {
   async likeConfession(confessionId: number): Promise<void> {
     await db
       .update(confessions)
-      .set({ likes: sum(confessions.likes, 1) })
+      .set({ 
+        likes: sql`${confessions.likes} + 1`
+      })
       .where(eq(confessions.id, confessionId));
   }
 

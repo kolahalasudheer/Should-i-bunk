@@ -51,6 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/bunk-decision', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      console.log('Request body:', req.body);
+      console.log('User ID:', userId);
+      
       const validatedData = insertBunkDecisionSchema.parse({
         ...req.body,
         userId,
