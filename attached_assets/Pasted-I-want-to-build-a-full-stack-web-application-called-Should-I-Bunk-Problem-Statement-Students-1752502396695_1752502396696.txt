@@ -1,0 +1,120 @@
+I want to build a full-stack web application called “Should I Bunk?”
+
+🎯 Problem Statement:
+Students often face a funny but real dilemma every day: “Should I attend today’s class or just bunk it?” This decision is influenced by various real-life factors like attendance %, mood, weather, upcoming tests, and peer pressure. But most apps don't let students make this decision with logic, fun, or context.
+
+💡 Goal of the Project:
+Create a web app that takes in user input, evaluates multiple personal + environmental factors through a smart rule-based scoring engine, and helps students decide whether to bunk a class or not — while making the process fun and intelligent using AI-powered excuses and explanations.
+
+🚀 What the Project Will Do:
+
+Accept student inputs:
+
+Current attendance percentage
+
+Mood level (e.g., tired, lazy, energetic)
+
+Days until next exam
+
+Professor strictness level
+
+Weather (via API)
+
+Day of the week
+
+Compute a Bunk Score using a custom, rule-based logic engine with weighted inputs
+
+Based on the score, provide one of three decisions:
+
+✅ "Yes, Bunk it!"
+
+⚠️ "Risky, Your Call"
+
+❌ "Don’t Bunk Today"
+
+Use Cohere API to generate:
+
+A funny or serious excuse ("Had food poisoning from hostel samosa")
+
+A smart explanation ("You’ve already missed 3 classes this week. Bunking again could drop your attendance below 75%.")
+
+Integrate OpenWeatherMap API to factor in current weather
+
+Show a decision dashboard with:
+
+Bunk Score
+
+Final Recommendation
+
+AI-generated excuse and explanation
+
+Maintain Bunk History and display analytics like:
+
+Days bunked
+
+Most common excuse
+
+Weekdays when bunking is highest
+
+Add Friend Voting: Let friends vote "Should you bunk today?" and show their responses
+
+Bonus: Add an Anonymous Confession Wall for users to share funny bunk reasons
+
+🛠️ Tech Stack:
+
+Frontend: React.js + Tailwind CSS
+
+Backend: FastAPI (Python)
+
+Auth: Firebase Authentication
+
+Database: MongoDB Atlas
+
+AI: Cohere API (generate endpoint) for excuses and explanations
+
+External API: OpenWeatherMap API (weather data)
+
+Deployment: Vercel (Frontend), Railway (Backend), MongoDB Atlas
+
+📊 Bunk Score Calculation (Rule-Based):
+A custom logic engine will compute a score (0–100) based on:
+
+java
+Copy
+Edit
+Bunk Score = (Attendance Score × 0.4) +
+             (Exam Proximity Score × 0.2) +
+             (Mood Score × 0.15) +
+             (Weather Score × 0.15) +
+             (Professor Strictness Score × 0.1)
+Thresholds:
+
+Score > 70 → Bunk
+
+Score 50–70 → Risky
+
+Score < 50 → Attend
+
+📈 Dashboard & Insights:
+
+Track decisions over time
+
+Graphs showing bunking patterns
+
+Most common excuses (from Cohere)
+
+Attendance progress visualization
+
+🎉 Unique Features:
+
+AI-generated bunk excuses
+
+Real-time weather influence
+
+Anonymous confession wall
+
+Friend-based decision voting
+
+Customizable scoring weights in JSON
+
+“Serial Bunker” badge system for fun engagement
