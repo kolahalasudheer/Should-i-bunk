@@ -66,7 +66,6 @@ export default function BunkDecisionForm({ onDecisionMade }: BunkDecisionFormPro
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log('Form submission data:', data);
     createDecisionMutation.mutate(data);
   };
 

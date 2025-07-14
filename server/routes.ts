@@ -51,56 +51,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/bunk-decision', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      console.log('Request body:', req.body);
-      console.log('User ID:', userId);
+      const { attendancePercentage, mood, daysUntilExam, professorStrictness } = req.body;
       
-      const validatedData = insertBunkDecisionSchema.parse({
-        ...req.body,
-        userId,
-      });
-
       // Get weather data
       const weatherData = await weatherService.getWeatherData();
       const weatherScore = weatherService.calculateWeatherScore(weatherData);
-
+      
       // Calculate bunk score
       const bunkScore = scoringService.calculateBunkScore({
-        attendancePercentage: validatedData.attendancePercentage,
-        daysUntilExam: validatedData.daysUntilExam,
-        mood: validatedData.mood,
-        professorStrictness: validatedData.professorStrictness,
+        attendancePercentage,
+        daysUntilExam,
+        mood,
+        professorStrictness,
         weatherScore,
       });
-
+      
+      // Get decision from score
       const decision = scoringService.getDecisionFromScore(bunkScore);
-
+      
       // Generate AI content
       const [aiExcuse, aiAnalysis] = await Promise.all([
         aiService.generateExcuse(
-          validatedData.mood,
+          mood,
           weatherData.condition,
-          validatedData.professorStrictness,
-          validatedData.attendancePercentage
+          professorStrictness,
+          attendancePercentage
         ),
         aiService.generateAnalysis(
-          validatedData.attendancePercentage,
-          validatedData.daysUntilExam,
-          validatedData.mood,
+          attendancePercentage,
+          daysUntilExam,
+          mood,
           bunkScore,
           decision
         ),
       ]);
-
-      // Save decision
-      const bunkDecision = await storage.createBunkDecision({
-        ...validatedData,
+      
+      // Prepare complete data for validation
+      const completeData = {
+        userId,
+        attendancePercentage,
+        mood,
+        daysUntilExam,
+        professorStrictness,
         weatherCondition: weatherData.condition,
         weatherTemperature: weatherData.temperature,
         bunkScore,
         decision,
         aiExcuse,
         aiAnalysis,
-      });
+      };
+      
+      const validatedData = insertBunkDecisionSchema.parse(completeData);
+
+      // Save decision
+      const bunkDecision = await storage.createBunkDecision(validatedData);
 
       // Check and award badges
       await checkAndAwardBadges(userId, bunkDecision);
