@@ -26,13 +26,13 @@ export default function Stats() {
   }, [isAuthenticated, isLoading, toast]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       <Header />
       
-      <main className="max-w-md mx-auto px-4 py-6">
+      <main className="w-full max-w-2xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Analytics</h2>
-          <p className="text-gray-600">Insights into your bunking patterns</p>
+          <h2 className="text-2xl font-bold mb-2">Your Analytics</h2>
+          <p className="text-muted-foreground">Insights into your bunking patterns</p>
         </div>
 
         <Analytics />

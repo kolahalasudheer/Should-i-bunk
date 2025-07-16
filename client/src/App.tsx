@@ -10,6 +10,10 @@ import History from "@/pages/history";
 import Stats from "@/pages/stats";
 import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
+import AttendedHistory from "@/pages/attended-history";
+import ConfessionsPage from "@/pages/confessions";
+import { ThemeProvider } from "@/lib/themeContext";
+import PlannerPage from "@/pages/planner";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,6 +28,8 @@ function Router() {
           <Route path="/history" component={History} />
           <Route path="/stats" component={Stats} />
           <Route path="/profile" component={Profile} />
+          <Route path="/attended-history" component={AttendedHistory} />
+          <Route path="/planner" component={PlannerPage} />
         </>
       )}
       <Route component={NotFound} />
@@ -33,12 +39,14 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

@@ -15,6 +15,9 @@ import {
   type InsertConfession,
   type UserBadge,
   type InsertUserBadge,
+  attendedClasses,
+  type InsertAttendedClass,
+  type AttendedClass,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sum, and, gte, lte, sql } from "drizzle-orm";
@@ -49,6 +52,10 @@ export interface IStorage {
     reasonBreakdown: Array<{ reason: string; percentage: number }>;
     weeklyPattern: number[];
   }>;
+
+  // Attended class operations
+  createAttendedClass(attended: InsertAttendedClass): Promise<AttendedClass>;
+  getAttendedClassesByUser(userId: string): Promise<AttendedClass[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -216,6 +223,23 @@ export class DatabaseStorage implements IStorage {
       reasonBreakdown,
       weeklyPattern,
     };
+  }
+
+  // Attended class operations
+  async createAttendedClass(attended: InsertAttendedClass): Promise<AttendedClass> {
+    const [attendedClass] = await db
+      .insert(attendedClasses)
+      .values(attended)
+      .returning();
+    return attendedClass;
+  }
+
+  async getAttendedClassesByUser(userId: string): Promise<AttendedClass[]> {
+    return await db
+      .select()
+      .from(attendedClasses)
+      .where(eq(attendedClasses.userId, userId))
+      .orderBy(desc(attendedClasses.createdAt));
   }
 }
 

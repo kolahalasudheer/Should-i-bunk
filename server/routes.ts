@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupGoogleAuth } from "./googleAuth";
 import { WeatherService } from "./services/weatherService";
 import { AIService } from "./services/aiService";
 import { ScoringService } from "./services/scoringService";
@@ -9,9 +9,11 @@ import {
   insertBunkDecisionSchema, 
   insertFriendVoteSchema, 
   insertConfessionSchema,
-  insertUserBadgeSchema 
+  insertUserBadgeSchema,
+  insertAttendedClassSchema
 } from "@shared/schema";
 import { z } from "zod";
+import authLocal from "./authLocal";
 
 const weatherService = new WeatherService();
 const aiService = new AIService();
@@ -19,18 +21,24 @@ const scoringService = new ScoringService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  setupGoogleAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
+  // Mount local auth routes
+  app.use("/api/auth", authLocal);
+
+  // TODO: Update the following routes to use Google user info from req.user
+  // For now, comment out or remove routes that depend on Replit-specific claims
+
+  // Example: Auth routes (update as needed for Google profile)
+  // app.get('/api/auth/user', (req: any, res) => {
+  //   if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  //   res.json(req.user);
+  // });
+
+  // Auth user endpoint for frontend to check login status
+  app.get('/api/auth/user', (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    res.json(req.user);
   });
 
   // Weather endpoint
@@ -48,9 +56,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bunk decision endpoint
-  app.post('/api/bunk-decision', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bunk-decision', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      console.log('req.user:', req.user);
+      // Try to get userId from sub, id, or email
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
       const { attendancePercentage, mood, daysUntilExam, professorStrictness } = req.body;
       
       // Get weather data
@@ -69,13 +85,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get decision from score
       const decision = scoringService.getDecisionFromScore(bunkScore);
       
+      // Gather additional context for AI prompt
+      const today = new Date();
+      const dayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' });
+      // Fetch recent attendance history (last 5 decisions)
+      const recentDecisions = await storage.getBunkDecisionsByUser(userId);
+      const last5 = recentDecisions.slice(0, 5);
+      const attendedCount = last5.filter(d => d.decision !== 'bunk').length;
+      const bunkedCount = last5.filter(d => d.decision === 'bunk').length;
+      const recentAttendance = `Attended ${attendedCount} and bunked ${bunkedCount} of last 5 classes`;
+      // Fetch trending excuses (top 2 reasons from analytics)
+      const analytics = await storage.getUserAnalytics(userId);
+      const trendingExcuses = analytics.reasonBreakdown
+        .sort((a, b) => b.percentage - a.percentage)
+        .slice(0, 2)
+        .map(r => r.reason)
+        .join(', ') || 'None';
       // Generate AI content
       const [aiExcuse, aiAnalysis] = await Promise.all([
         aiService.generateExcuse(
           mood,
           weatherData.condition,
           professorStrictness,
-          attendancePercentage
+          attendancePercentage,
+          dayOfWeek,
+          recentAttendance,
+          trendingExcuses
         ),
         aiService.generateAnalysis(
           attendancePercentage,
@@ -124,9 +159,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's bunk history
-  app.get('/api/bunk-history', isAuthenticated, async (req: any, res) => {
+  app.get('/api/bunk-history', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
       const decisions = await storage.getBunkDecisionsByUser(userId);
       res.json(decisions);
     } catch (error) {
@@ -163,9 +204,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Confession wall endpoints
-  app.post('/api/confessions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/confessions', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
       const validatedData = insertConfessionSchema.parse({
         ...req.body,
         userId,
@@ -206,9 +253,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User badges endpoint
-  app.get('/api/user-badges', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user-badges', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
       const badges = await storage.getUserBadges(userId);
       res.json(badges);
     } catch (error) {
@@ -218,15 +271,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User analytics endpoint
-  app.get('/api/analytics', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
       const analytics = await storage.getUserAnalytics(userId);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ message: "Failed to fetch analytics" });
     }
+  });
+
+  // Attended class endpoint
+  app.post('/api/class-attended', async (req: any, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
+      const { attendancePercentage, mood, daysUntilExam, professorStrictness } = req.body;
+      const completeData = {
+        userId,
+        attendancePercentage,
+        mood,
+        daysUntilExam,
+        professorStrictness,
+      };
+      const validatedData = insertAttendedClassSchema.parse(completeData);
+      const attendedClass = await storage.createAttendedClass(validatedData);
+      res.json(attendedClass);
+    } catch (error) {
+      console.error('Error logging attended class:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid input data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to log attended class' });
+      }
+    }
+  });
+
+  // Get user's attended history
+  app.get('/api/attended-history', async (req: any, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      const userId = req.user.sub || req.user.id || req.user.email;
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID not found in session' });
+      }
+      const attended = await storage.getAttendedClassesByUser(userId);
+      res.json(attended);
+    } catch (error) {
+      console.error('Error fetching attended history:', error);
+      res.status(500).json({ message: 'Failed to fetch attended history' });
+    }
+  });
+
+  // Attendance planner endpoint
+  app.post('/api/attendance-planner', (req, res) => {
+    const schema = z.object({
+      totalConducted: z.number().int(),
+      attended: z.number().int(),
+      remaining: z.number().int(),
+      threshold: z.number().optional().default(75),
+    });
+    const parse = schema.safeParse(req.body);
+    if (!parse.success) {
+      return res.status(400).json({ message: "Invalid input", errors: parse.error.errors });
+    }
+    const { totalConducted, attended, remaining, threshold } = parse.data;
+    const currentAttendance = totalConducted > 0 ? (attended / totalConducted) * 100 : 0;
+
+    const table = [];
+    for (let x = 0; x <= remaining; x++) {
+      const attendedFinal = attended + x;
+      const conductedFinal = totalConducted + remaining;
+      const percent = conductedFinal > 0 ? (attendedFinal / conductedFinal) * 100 : 0;
+      table.push({ attend: x, bunk: remaining - x, predicted: percent });
+    }
+    const maxPossible = table[remaining]?.predicted ?? 0;
+    const minPossible = table[0]?.predicted ?? 0;
+    let mustAttend = 0;
+    for (let x = 0; x <= remaining; x++) {
+      if (table[x].predicted >= threshold) {
+        mustAttend = x;
+        break;
+      }
+    }
+    let recommendation = "";
+    let icon = "";
+    if (currentAttendance >= threshold + 5) {
+      const safeBunks = table.filter(row => row.predicted >= threshold).length - 1;
+      recommendation = `You're at ${currentAttendance.toFixed(1)}%. You can safely bunk ${safeBunks} more classes and still stay above ${threshold}%.`;
+      icon = "✅";
+    } else if (currentAttendance >= threshold) {
+      const safeBunks = table.filter(row => row.predicted >= threshold).length - 1;
+      recommendation = `Your attendance is currently ${currentAttendance.toFixed(1)}%. You can bunk only ${safeBunks} more class${safeBunks === 1 ? '' : 'es'} before dropping below ${threshold}%.`;
+      icon = "⚠️";
+    } else if (maxPossible < threshold) {
+      recommendation = `With ${remaining} classes left and ${currentAttendance.toFixed(1)}% attendance, attending all of them will take you to ${maxPossible.toFixed(1)}% — still not enough. Consult your faculty ASAP.`;
+      icon = "🔄";
+    } else if (mustAttend > remaining) {
+      recommendation = `You're already at ${currentAttendance.toFixed(1)}%. You cannot afford to miss any more classes if you want to hit the ${threshold}% mark.`;
+      icon = "🛑";
+    } else {
+      recommendation = `You're at ${currentAttendance.toFixed(1)}%. You must attend at least ${mustAttend} out of the next ${remaining} classes to reach ${threshold}% before exams.`;
+      icon = "❌";
+    }
+    res.json({
+      maxPossible,
+      minPossible,
+      table,
+      mustAttend,
+      recommendation,
+      icon,
+    });
   });
 
   // Helper function to check and award badges

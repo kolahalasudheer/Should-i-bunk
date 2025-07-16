@@ -30,6 +30,7 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique(),
+  password_hash: varchar("password_hash"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -90,6 +91,17 @@ export const userBadges = pgTable("user_badges", {
 }, (table) => [
   unique().on(table.userId, table.badgeType),
 ]);
+
+// Attended classes table
+export const attendedClasses = pgTable("attended_classes", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  attendancePercentage: integer("attendance_percentage").notNull(),
+  mood: varchar("mood").notNull(), // tired, lazy, energetic
+  daysUntilExam: integer("days_until_exam").notNull(),
+  professorStrictness: varchar("professor_strictness").notNull(), // chill, moderate, strict
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
@@ -162,6 +174,11 @@ export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({
   earnedAt: true,
 });
 
+export const insertAttendedClassSchema = createInsertSchema(attendedClasses).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -173,3 +190,5 @@ export type Confession = typeof confessions.$inferSelect;
 export type InsertConfession = z.infer<typeof insertConfessionSchema>;
 export type UserBadge = typeof userBadges.$inferSelect;
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type AttendedClass = typeof attendedClasses.$inferSelect;
+export type InsertAttendedClass = z.infer<typeof insertAttendedClassSchema>;

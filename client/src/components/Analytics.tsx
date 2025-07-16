@@ -1,14 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, Calendar, Target, BarChart3 } from "lucide-react";
+import { TrendingUp, Calendar, Target, BarChart3, PieChart } from "lucide-react";
+import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { useCallback } from "react";
+
+interface AnalyticsData {
+  totalBunks: number;
+  attendanceRate: number;
+  reasonBreakdown: Array<{ reason: string; percentage: number }>;
+  weeklyPattern: number[];
+}
 
 export default function Analytics() {
-  const { data: analytics, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["/api/analytics"],
     retry: false,
   });
+  const analytics = data as AnalyticsData | undefined;
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const COLORS = ['#34d399', '#f87171']; // green for attended, red for bunked
 
   if (isLoading) {
     return (
@@ -46,7 +57,22 @@ export default function Analytics() {
     );
   }
 
-  const maxWeeklyValue = Math.max(...analytics.weeklyPattern);
+  // Simulate attended classes if not available
+  const totalBunks = analytics.totalBunks;
+  const totalClasses = Math.round(totalBunks / (1 - analytics.attendanceRate / 100));
+  const attended = totalClasses - totalBunks;
+  const pieData = [
+    { name: 'Attended', value: attended },
+    { name: 'Bunked', value: totalBunks },
+  ];
+
+  // Find most bunked day
+  const maxBunk = Math.max(...analytics.weeklyPattern);
+  const mostBunkedDayIdx = analytics.weeklyPattern.findIndex((v: number) => v === maxBunk);
+  const mostBunkedDay = weekDays[mostBunkedDayIdx] || '-';
+
+  // Attendance trend
+  const trend = analytics.attendanceRate >= 75 ? 'Good! Keep it up.' : 'Below target. Attend more!';
 
   return (
     <Card className="border-none shadow-lg">
@@ -69,6 +95,24 @@ export default function Analytics() {
           </div>
         </div>
 
+        {/* Pie Chart: Attended vs Bunked */}
+        <div className="mb-6">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2"><PieChart className="w-5 h-5" /> Attended vs Bunked</h4>
+          <div className="w-full max-w-xs mx-auto">
+            <ResponsiveContainer width="100%" height={200}>
+              <RePieChart>
+                <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                  {pieData.map((entry, idx) => (
+                    <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </RePieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
         {/* Most Common Reasons */}
         {analytics.reasonBreakdown && analytics.reasonBreakdown.length > 0 && (
           <div className="mb-6">
@@ -77,7 +121,6 @@ export default function Analytics() {
               {analytics.reasonBreakdown.map((reason: any, index: number) => {
                 const colors = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500'];
                 const color = colors[index % colors.length];
-                
                 return (
                   <div key={reason.reason} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-2">
@@ -99,15 +142,12 @@ export default function Analytics() {
           <h4 className="font-semibold text-gray-900 mb-3">Weekly pattern</h4>
           <div className="flex items-end space-x-1 h-20">
             {analytics.weeklyPattern.map((value: number, index: number) => {
-              const height = maxWeeklyValue > 0 ? (value / maxWeeklyValue) * 100 : 0;
-              const isHighActivity = value > 0 && value >= maxWeeklyValue * 0.7;
-              
+              const height = Math.max(...analytics.weeklyPattern) > 0 ? (value / Math.max(...analytics.weeklyPattern)) * 100 : 0;
+              const isHighActivity = value > 0 && value >= Math.max(...analytics.weeklyPattern) * 0.7;
               return (
                 <div
                   key={index}
-                  className={`flex-1 rounded-t transition-all ${
-                    isHighActivity ? 'bg-primary' : 'bg-gray-200'
-                  }`}
+                  className={`flex-1 rounded-t transition-all ${isHighActivity ? 'bg-primary' : 'bg-gray-200'}`}
                   style={{ height: `${Math.max(height, 10)}%` }}
                   title={`${weekDays[index]}: ${value} bunks`}
                 ></div>
@@ -118,6 +158,16 @@ export default function Analytics() {
             {weekDays.map((day) => (
               <span key={day}>{day}</span>
             ))}
+          </div>
+        </div>
+
+        {/* Actionable Insights */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-green-50 rounded-lg text-green-900">
+            <b>Most bunked day:</b> {mostBunkedDay}
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg text-blue-900">
+            <b>Attendance trend:</b> {trend}
           </div>
         </div>
 
@@ -146,4 +196,12 @@ export default function Analytics() {
       </CardContent>
     </Card>
   );
+}
+
+// Utility hook to invalidate analytics stats
+export function useInvalidateAnalyticsStats() {
+  const queryClient = useQueryClient();
+  return useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/analytics"] });
+  }, [queryClient]);
 }
