@@ -48,6 +48,12 @@ export function setupGoogleAuth(app: Express) {
           });
           user = (await db.select().from(users).where(eq(users.email, email)))[0];
         }
+        // Update lastLogin
+        if (user && user.id) {
+          await db.update(users)
+            .set({ lastLogin: new Date() })
+            .where(eq(users.id, user.id));
+        }
         return done(null, user);
       } catch (err) {
         return done(err);

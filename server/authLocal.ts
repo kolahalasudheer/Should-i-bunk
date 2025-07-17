@@ -84,9 +84,12 @@ router.post("/login", async (req: Request, res: Response) => {
     }
     // Success: clear attempts
     delete loginAttempts[key];
-    // @ts-ignore
     if (typeof user.id === 'string') {
-      req.session.userId = user.id;
+      (req.session as any).userId = user.id;
+      // Update lastLogin
+      await db.update(users)
+        .set({ lastLogin: new Date() })
+        .where(eq(users.id, user.id));
     } else {
       return res.status(500).json({ message: "User ID is invalid" });
     }

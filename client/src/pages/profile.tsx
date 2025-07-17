@@ -7,7 +7,7 @@ import BottomNavigation from "@/components/BottomNavigation";
 import BadgeSystem from "@/components/BadgeSystem";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Mail, Calendar } from "lucide-react";
+import { LogOut, User, Mail, Calendar, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { useState } from "react";
@@ -19,6 +19,7 @@ interface User {
   lastName?: string;
   email?: string;
   createdAt?: string;
+  lastLogin?: string;
 }
 
 export default function Profile() {
@@ -139,21 +140,31 @@ export default function Profile() {
                 </div>
               </div>
 
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <Clock className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Last Login</p>
+                  <p className="text-sm text-gray-600">
+                    {localUser?.lastLogin
+                      ? new Date(localUser.lastLogin).toLocaleString(undefined, {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      : '(Not tracked)'}
+                  </p>
+                </div>
+              </div>
+
               {/* Full Name */}
               <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Full Name</p>
                   <p className="text-sm text-gray-600">{`${localUser?.firstName || ''} ${localUser?.lastName || ''}`.trim() || 'Not provided'}</p>
-                </div>
-              </div>
-
-              {/* Last Login (placeholder) */}
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <Calendar className="w-5 h-5 text-gray-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Last Login</p>
-                  <p className="text-sm text-gray-600">(Not tracked)</p>
                 </div>
               </div>
 

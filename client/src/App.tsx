@@ -14,12 +14,15 @@ import AttendedHistory from "@/pages/attended-history";
 import ConfessionsPage from "@/pages/confessions";
 import { ThemeProvider } from "@/lib/themeContext";
 import PlannerPage from "@/pages/planner";
+import PollPage from "@/pages/poll";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <Switch>
+      {/* Public poll route, available to everyone */}
+      <Route path="/poll/:decisionId" component={PollPage} />
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

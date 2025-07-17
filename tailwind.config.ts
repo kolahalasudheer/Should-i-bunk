@@ -79,10 +79,28 @@ export default {
             height: "0",
           },
         },
+        // Custom animations for landing page polish
+        "fade-in-down": {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        "fade-in-up": {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        "gradient-x": {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        // Custom animations for landing page polish
+        "fade-in-down": "fade-in-down 0.7s both",
+        "fade-in-up": "fade-in-up 0.7s both",
+        "gradient-x": "gradient-x 3s ease-in-out infinite",
+        "bounce-slow": "bounce 2.5s infinite",
       },
     },
   },

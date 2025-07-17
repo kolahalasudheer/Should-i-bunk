@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, History, BarChart3, User, MessageCircle } from "lucide-react";
+import { Home, History, BarChart3, User, CalendarCheck2 } from "lucide-react";
 
 interface BottomNavigationProps {
   currentPage: string;
@@ -12,7 +12,7 @@ export default function BottomNavigation({ currentPage }: BottomNavigationProps)
     { id: "home", label: "Home", icon: Home, path: "/" },
     { id: "history", label: "History", icon: History, path: "/history" },
     { id: "stats", label: "Stats", icon: BarChart3, path: "/stats" },
-    { id: "planner", label: "Planner", icon: BarChart3, path: "/planner" },
+    { id: "planner", label: "Planner", icon: CalendarCheck2, path: "/planner" },
     { id: "profile", label: "Profile", icon: User, path: "/profile" },
   ];
 

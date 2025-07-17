@@ -97,20 +97,26 @@ export default function Home() {
       <Header />
       <main className="w-full max-w-2xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
         {/* Hero Section */}
-        <Card className="border-none shadow-xl mb-2 bg-gradient-to-r from-white/90 to-blue-50/80 dark:from-gray-900/80 dark:to-gray-800/80">
+        <Card className="border-none shadow-2xl mb-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md animate-fade-in-down">
           <CardContent className="flex flex-col sm:flex-row items-center gap-4 p-6">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 relative">
               {avatarUrl ? (
-                <img src={avatarUrl} alt="avatar" className="w-16 h-16 rounded-full object-cover border-4 border-primary shadow" />
+                <span className="inline-block w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary via-fuchsia-500 to-purple-600 animate-gradient-x">
+                  <img src={avatarUrl} alt="avatar" className="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-900 shadow-lg" />
+                </span>
               ) : (
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-primary shadow">
-                  <User className="w-8 h-8" />
-                </div>
+                <span className="inline-block w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary via-fuchsia-500 to-purple-600 animate-gradient-x">
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white text-3xl font-bold border-4 border-white dark:border-gray-900 shadow-lg">
+                    <User className="w-10 h-10" />
+                  </div>
+                </span>
               )}
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <div className="text-2xl font-bold mb-1">Welcome, {displayName}!</div>
-              <div className="text-sm text-muted-foreground flex items-center justify-center sm:justify-start gap-2">
+              <div className="text-2xl font-extrabold mb-1 animate-fade-in-down tracking-tight">
+                Welcome, {displayName}!
+              </div>
+              <div className="text-sm text-muted-foreground flex items-center justify-center sm:justify-start gap-2 animate-fade-in-up">
                 <Sparkles className="text-yellow-400 w-4 h-4" /> {FUN_FACTS[factIdx]}
               </div>
             </div>
@@ -118,36 +124,40 @@ export default function Home() {
         </Card>
 
         {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-2">
+        <div className="flex flex-col sm:flex-row gap-3 mb-2 animate-fade-in-up">
           <button
             onClick={handleMarkAttended}
-            className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold py-3 rounded-xl shadow transition-all text-lg"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-400 via-green-500 to-emerald-500 hover:from-green-500 hover:to-emerald-600 active:from-green-600 active:to-emerald-700 text-white font-semibold py-3 rounded-2xl shadow-lg transition-all text-lg focus:outline-none focus:ring-2 focus:ring-green-400"
           >
             <CalendarCheck2 className="w-6 h-6" /> Mark Attended
           </button>
           <button
             onClick={handleMarkBunked}
-            className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold py-3 rounded-xl shadow transition-all text-lg"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-red-400 via-red-500 to-pink-500 hover:from-red-500 hover:to-pink-600 active:from-red-600 active:to-pink-700 text-white font-semibold py-3 rounded-2xl shadow-lg transition-all text-lg focus:outline-none focus:ring-2 focus:ring-red-400"
           >
             <CalendarX2 className="w-6 h-6" /> Mark Bunked
           </button>
           <button
             onClick={handleViewPlanner}
-            className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow transition-all text-lg"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-400 via-blue-500 to-purple-500 hover:from-blue-500 hover:to-purple-600 active:from-blue-600 active:to-purple-700 text-white font-semibold py-3 rounded-2xl shadow-lg transition-all text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <CalendarDays className="w-6 h-6" /> View Planner
           </button>
         </div>
 
         {/* Main Form and Results */}
-        <BunkDecisionForm onDecisionMade={setCurrentDecision} weather={weather} weatherLoading={weatherLoading} weatherError={weatherError} />
-        {currentDecision && (
-          <>
-            <BunkResult decision={currentDecision} />
-            <FriendVoting decisionId={currentDecision.id} />
-          </>
-        )}
-        <BadgeSystem />
+        <div className="animate-fade-in-up">
+          <BunkDecisionForm onDecisionMade={setCurrentDecision} weather={weather} weatherLoading={weatherLoading} weatherError={weatherError} />
+          {currentDecision && (
+            <div className="space-y-4 mt-4">
+              <BunkResult decision={currentDecision} />
+              <FriendVoting decisionId={currentDecision.id} />
+            </div>
+          )}
+          <div className="mt-4">
+            <BadgeSystem />
+          </div>
+        </div>
       </main>
       <BottomNavigation currentPage="home" />
     </div>
