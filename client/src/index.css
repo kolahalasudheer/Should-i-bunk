@@ -57,9 +57,8 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  /* Removed global @apply border-border; as it causes issues. 
+     Use the .border-border utility class on elements that need a custom border color. */
 
   body {
     @apply font-sans antialiased bg-background text-foreground;

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: should-i-bunk
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Add your other environment variables here or in the Render dashboard
+    plan: free 
