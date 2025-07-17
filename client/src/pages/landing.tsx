@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import { GraduationCap, Brain, Users, TrendingUp, Sparkles } from "lucide-react";
-import AuthForm from "@/components/AuthForm";
+import AuthForm from "../components/AuthForm";
 import { useEffect, useRef } from "react";
 
 export default function Landing() {
