@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "build": "cd client && npm install && npm run build && cd .. && tsc --project server && mkdir -p server/dist/client && cp -r client/dist/* server/dist/client/",
-    "start": "node server/dist/index.js",
+    "start": "node dist/server/index.js",
     "postinstall": "cd client && npm install",
     "check": "tsc",
     "db:push": "drizzle-kit push"
