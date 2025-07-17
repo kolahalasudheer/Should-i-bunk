@@ -1,6 +1,6 @@
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import PersonalizedPlanner from "@/components/PersonalizedPlanner";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import PersonalizedPlanner from "../components/PersonalizedPlanner";
 
 export default function PlannerPage() {
   return (
