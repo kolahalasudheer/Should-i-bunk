@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import Analytics from "@/components/Analytics";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/use-toast";
+import { isUnauthorizedError } from "../lib/authUtils";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import Analytics from "../components/Analytics";
 
 export default function Stats() {
   const { toast } = useToast();

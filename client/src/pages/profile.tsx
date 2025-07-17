@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import BadgeSystem from "@/components/BadgeSystem";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/use-toast";
+import { isUnauthorizedError } from "../lib/authUtils";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import BadgeSystem from "../components/BadgeSystem";
+import { Card, CardContent } from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import { LogOut, User, Mail, Calendar, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from "../components/ui/dialog";
 import { useState } from "react";
 
 // Add User type for type safety

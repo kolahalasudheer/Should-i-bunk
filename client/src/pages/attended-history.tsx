@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/use-toast";
+import { isUnauthorizedError } from "../lib/authUtils";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
 import { Calendar, Clock, CheckCircle } from "lucide-react";
 
 function formatDate(dateString: string) {

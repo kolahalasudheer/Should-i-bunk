@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun, CloudSun, User, Sparkles, CalendarCheck2, CalendarX2, CalendarDays } from "lucide-react";
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import BunkDecisionForm from "@/components/BunkDecisionForm";
-import BunkResult from "@/components/BunkResult";
-import FriendVoting from "@/components/FriendVoting";
-import BadgeSystem from "@/components/BadgeSystem";
-import { useAuth } from "@/hooks/useAuth";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import BunkDecisionForm from "../components/BunkDecisionForm";
+import BunkResult from "../components/BunkResult";
+import FriendVoting from "../components/FriendVoting";
+import BadgeSystem from "../components/BadgeSystem";
+import { useAuth } from "../hooks/useAuth";
 import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 
 const FUN_FACTS = [
   "Did you know? Students who track their attendance are 30% less likely to fall below 75%!",

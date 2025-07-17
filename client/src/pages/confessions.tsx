@@ -1,6 +1,6 @@
-import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
-import ConfessionWall from "@/components/ConfessionWall";
+import Header from "../components/Header";
+import BottomNavigation from "../components/BottomNavigation";
+import ConfessionWall from "../components/ConfessionWall";
 
 export default function ConfessionsPage() {
   return (
