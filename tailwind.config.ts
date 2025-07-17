@@ -62,6 +62,30 @@ export default {
           ring: "var(--sidebar-ring)",
         },
       },
+      backgroundColor: theme => ({
+        ...theme("colors"),
+        background: "var(--background)",
+        popover: "var(--popover)",
+        card: "var(--card)",
+        accent: "var(--accent)",
+        warning: "hsl(var(--warning))",
+        danger: "hsl(var(--danger))",
+      }),
+      textColor: theme => ({
+        ...theme("colors"),
+        foreground: "var(--foreground)",
+        "popover-foreground": "var(--popover-foreground)",
+        "card-foreground": "var(--card-foreground)",
+        "accent-foreground": "var(--accent-foreground)",
+        "warning-foreground": "hsl(var(--warning-foreground))",
+        "danger-foreground": "hsl(var(--danger-foreground))",
+      }),
+      borderColor: theme => ({
+        ...theme("colors"),
+        border: "var(--border)",
+        warning: "hsl(var(--warning))",
+        danger: "hsl(var(--danger))",
+      }),
       keyframes: {
         "accordion-down": {
           from: {
