@@ -1,4 +1,4 @@
-import FriendVoting from "@/components/FriendVoting";
+import FriendVoting from "../components/FriendVoting";
 import { useRoute } from "wouter";
 
 export default function PollPage() {
