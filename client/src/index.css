@@ -67,6 +67,9 @@
 }
 
 @layer utilities {
+  .border-border {
+    border-color: hsl(var(--border));
+  }
   .text-warning {
     color: hsl(var(--warning));
   }
