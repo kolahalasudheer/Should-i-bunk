@@ -88,7 +88,7 @@ Go to: [http://localhost:5173](http://localhost:5173)
 ## 📁 Project Structure
 
 
-project-root/
+'''project-root/
 ├── client/
 │   └── src/
 │       ├── components/
@@ -122,7 +122,7 @@ project-root/
 ├── .env
 ├── .gitignore
 ├── render.yaml
-└── drizzle.config.ts
+└── drizzle.config.ts'''
 
 
 ### Key Files & Folders
