@@ -88,28 +88,41 @@ Go to: [http://localhost:5173](http://localhost:5173)
 ## 📁 Project Structure
 
 
-should-i-bunk/
-├── client/                 # Frontend React Application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Main app pages
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── utils/          # Helper functions
-│   │   └── App.tsx         # Main app component
-│   ├── public/             # Static assets
-│   └── package.json        # Frontend dependencies
+project-root/
+├── client/
+│   └── src/
+│       ├── components/
+│       ├── hooks/
+│       │   ├── use-mobile.tsx
+│       │   ├── use-toast.ts
+│       │   └── useAuth.ts
+│       ├── lib/
+│       ├── pages/
+│       ├── App.tsx
+│       ├── index.css
+│       └── main.tsx
+│   ├── index.html
+│   └── vite.config.ts
 │
-├── server/                 # Backend API Server
-│   ├── src/
-│   │   ├── routes/         # API endpoints
-│   │   ├── controllers/    # Business logic
-│   │   ├── models/         # Database models
-│   │   ├── middleware/     # Custom middleware
-│   │   └── app.ts          # Express server setup
-│   ├── drizzle/            # Database migrations
-│   └── package.json        # Backend dependencies
+├── server/
+│   ├── services/
+│   ├── shared/
+│   │   └── schema.ts
+│   ├── authLocal.ts
+│   ├── db.ts
+│   ├── googleAuth.ts
+│   ├── index.ts
+│   ├── routes.ts
+│   ├── storage.ts
+│   └── vite.ts
 │
-└── README.md               # Project documentation
+├── types/
+│   └── express-session/
+│
+├── .env
+├── .gitignore
+├── render.yaml
+└── drizzle.config.ts
 
 
 ### Key Files & Folders
