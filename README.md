@@ -57,30 +57,33 @@ Sample outputs the app gives you:
 | PostgreSQL (Neon) | Database to store data |
 | Render | Hosting the website |
 
-## 🚀 Quick Start
+### 1. Get the Code
 
-### 1. Get the code
-bash
+```bash
 git clone https://github.com/kolahalasudheer/should-i-bunk.git
 cd should-i-bunk
+```
 
+### 2. Start the Backend
 
-### 2. Start the backend
-bash
+```bash
 cd server
 npm install
 npm run dev
+```
 
+### 3. Start the Frontend
 
-### 3. Start the frontend
-bash
+```bash
 cd client
 npm install
 npm run dev
+```
 
+### 4. Open Your Browser
 
-### 4. Open your browser
-Go to http://localhost:5173 and you're ready!
+Go to: [http://localhost:5173](http://localhost:5173)
+
 
 ## 📁 Project Structure
 
